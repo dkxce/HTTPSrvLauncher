@@ -1,0 +1,10 @@
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\bin\Debug\HTTPSrvLauncher.exe
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\bin\Debug\Newtonsoft.Json.dll
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\bin\Debug\HTTPSrvLauncher.exe.config
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\bin\Debug\HTTPSrvLauncher.pdb
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\bin\Debug\Newtonsoft.Json.xml
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\obj\Debug\HTTPSrvLauncher.csproj.AssemblyReference.cache
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\obj\Debug\HTTPSrvLauncher.csproj.CoreCompileInputs.cache
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\obj\Debug\HTTPSrvL.0527A295.Up2Date
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\obj\Debug\HTTPSrvLauncher.exe
+C:\Users\dkxce\source\repos3\HTTPSrvLauncher\obj\Debug\HTTPSrvLauncher.pdb

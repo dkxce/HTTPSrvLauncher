@@ -1,0 +1,7 @@
+{	
+    "8090": {
+        "ServerPath": "C:\\DISK4\\TorrServer\\TorrServer-windows-amd64.exe",
+		"SendWebRedirect": true,
+		"Arguments": "--path \"C:\\DISK4\\TorrServer\""
+    }
+}
