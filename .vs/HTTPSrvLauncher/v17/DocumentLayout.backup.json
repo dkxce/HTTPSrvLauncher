@@ -5,6 +5,12 @@
     {
       "AbsoluteMoniker": "D:0:0:{E442C208-C95C-4908-AE0C-7EE1ED298CED}|HTTPSrvLauncher.csproj|c:\\users\\dkxce\\source\\repos3\\httpsrvlauncher\\httpsrvlauncher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E442C208-C95C-4908-AE0C-7EE1ED298CED}|HTTPSrvLauncher.csproj|solutionrelative:httpsrvlauncher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00000000-0000-0000-0000-000000000000}|\u003CSolution\u003E|HTTPSrvLauncher||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E442C208-C95C-4908-AE0C-7EE1ED298CED}|HTTPSrvLauncher.csproj|c:\\users\\dkxce\\source\\repos3\\httpsrvlauncher\\||{B270807C-D8C6-49EB-8EBE-8E8D566637A1}|5e9a8ac2-4f34-4521-858f-4c248ba31532"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,11 +20,23 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "HTTPSrvLauncher",
+              "DocumentMoniker": "C:\\Users\\dkxce\\source\\repos3\\HTTPSrvLauncher\\HTTPSrvLauncher.csproj",
+              "RelativeDocumentMoniker": "HTTPSrvLauncher.csproj",
+              "ToolTip": "C:\\Users\\dkxce\\source\\repos3\\HTTPSrvLauncher\\HTTPSrvLauncher.csproj",
+              "RelativeToolTip": "HTTPSrvLauncher.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-08-10T06:04:49.834Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -28,7 +46,7 @@
               "RelativeDocumentMoniker": "HTTPSrvLauncher.cs",
               "ToolTip": "C:\\Users\\dkxce\\source\\repos3\\HTTPSrvLauncher\\HTTPSrvLauncher.cs",
               "RelativeToolTip": "HTTPSrvLauncher.cs",
-              "ViewState": "AgIAAEEAAAAAAAAAAAAwwMwAAAArAAAAAAAAAA==",
+              "ViewState": "AgIAADsAAAAAAAAAAAAkwEEAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-07T12:54:42.785Z",
               "EditorCaption": ""

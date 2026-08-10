@@ -8,7 +8,6 @@ using System.Text;
 using Newtonsoft.Json;
 using System.Net;
 using System.Threading;
-using System.Runtime.InteropServices;
 using System.Net.NetworkInformation;
 
 namespace HTTPSrvLauncher
@@ -18,6 +17,11 @@ namespace HTTPSrvLauncher
         public string ServerPath { get; set; } = string.Empty;
         public string Arguments { get; set; } = string.Empty;
         public bool SendWebRedirect { get; set; }
+        public int RedirectDelay { get; set; } = 10;
+        public bool LoopOnAppExit { get; set; } = true;
+        public bool WaitForExit { get; set; } = true;
+        public bool CheckPortBusy { get; set; } = true;
+        public bool AppLog { get; set; } = true;
 
         [JsonIgnore]
         public TcpListener listener = null;
@@ -58,35 +62,41 @@ namespace HTTPSrvLauncher
 
         private void RunTcpListener(PortConfig pc)
         {
+            string fileLog = pc.AppLog ? Path.GetFileNameWithoutExtension(pc.ServerPath) : null;
+            Append2Log("---", fileLog);
+            Append2Log($"Start {fileLog}:{pc.port} thread", fileLog);
+
             while (true)
             {
-                if (IsPortBusy(pc.port))
+                if (pc.CheckPortBusy && IsPortBusy(pc.port))
                 {
                     if (!is_running) return;
                     Thread.Sleep(2500);
                     continue;
                 };
+
                 pc.listener = new TcpListener(IPAddress.Any, pc.port);
                 pc.listener.Start();
-
                 using (TcpClient client = pc.listener.AcceptTcpClient())
                 {
+                    Append2Log($"GetClient {fileLog}:{pc.port} - {client.Client.RemoteEndPoint}", fileLog);
                     if (pc.SendWebRedirect)
                     {
                         using (NetworkStream stream = client.GetStream())
                         {
+                            Append2Log($"Send HTML Redirect {fileLog}:{pc.port} - {client.Client.RemoteEndPoint}", fileLog);
                             string html = "<html>" +
                                           "<head>" +
-                                          "  <meta http-equiv='refresh' content='10'>" +
+                                         $"  <meta http-equiv='refresh' content='{pc.RedirectDelay}'>" +
                                           "  <meta http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate'>" +
                                           "  <meta http-equiv='Pragma' content='no-cache'>" +
                                           "  <meta http-equiv='Expires' content='0'>" +
                                           "</head>" +
                                           "<body style='font-family: Arial, sans-serif; margin: 20px;'>" +
                                          $"  <p>Launching server <strong>{pc.ServerPath}</strong>, please refresh...</p>" +
-                                          "  <p>Next refresh in: <strong id='countdown'>10</strong> sec.</p>" +
+                                         $"  <p>Next refresh in: <strong id='countdown'>{pc.RedirectDelay}</strong> sec.</p>" +
                                           "  <script>" +
-                                          "    let seconds = 10;" +
+                                         $"    let seconds = {pc.RedirectDelay};" +
                                           "    const countdownElement = document.getElementById('countdown');" +
                                           "    const interval = setInterval(() => {" +
                                           "      seconds--;" +
@@ -120,6 +130,7 @@ namespace HTTPSrvLauncher
                 Process proc = new Process();
                 try
                 {
+                    Append2Log($"Starting {fileLog}:{pc.port}", fileLog);
                     proc.StartInfo.FileName = pc.ServerPath;
                     proc.StartInfo.Arguments = pc.Arguments;
                     proc.StartInfo.UseShellExecute = false;
@@ -131,12 +142,17 @@ namespace HTTPSrvLauncher
                 }
                 catch (Exception ex)
                 {
+                    Append2Log($"Launch {fileLog}:{pc.port} error: {ex.Message}", fileLog);
                     Write2Log($"Launch {pc.ServerPath} error: {ex.Message}", EventLogEntryType.Error);
                 };
+                if(proc != null && !proc.HasExited)
+                    Append2Log($"Started {fileLog}:{pc.port} error: {pc.ServerPath}", fileLog);
 
-                while (is_running && (proc != null && !proc.HasExited)) Thread.Sleep(5000);
+                while (is_running && (pc.WaitForExit && proc != null && !proc.HasExited)) Thread.Sleep(5000);
                 if (!is_running) return;
+                if (!pc.LoopOnAppExit) return;
                 Thread.Sleep(2500);
+                Append2Log($"Loop {fileLog}:{pc.port} thread", fileLog);
             };           
         }
 
@@ -180,6 +196,21 @@ namespace HTTPSrvLauncher
             catch { };
         }
 
+        private static void Append2Log(string text, string file)
+        {
+            if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(file)) return;
+            string fn = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), $"-{file}-log.txt");
+            try
+            {
+                FileStream fs = new FileStream(fn, FileMode.Append, FileAccess.Write, FileShare.Read);
+                StreamWriter sw = new StreamWriter(fs);
+                sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + $": {text}");
+                sw.Close();
+                fs.Close();
+            }
+            catch { };
+        }
+
         private bool LoadConfig()
         {
             string cfg = Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "HTTPSrvLauncher.json");
@@ -207,159 +238,6 @@ namespace HTTPSrvLauncher
             };
 
             return true;
-        }
-    }
-
-    public static class InteractiveProcessLauncher
-    {
-        #region Win32 API Structures & Constants
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct STARTUPINFO
-        {
-            public int cb;
-            public string lpReserved;
-            public string lpDesktop;
-            public string lpTitle;
-            public int dwX;
-            public int dwY;
-            public int dwXSize;
-            public int dwYSize;
-            public int dwXCountChars;
-            public int dwYCountChars;
-            public int dwFillAttribute;
-            public int dwFlags;
-            public short wShowWindow;
-            public short cbReserved2;
-            public IntPtr lpReserved2;
-            public IntPtr hStdInput;
-            public IntPtr hStdOutput;
-            public IntPtr hStdError;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct PROCESS_INFORMATION
-        {
-            public IntPtr hProcess;
-            public IntPtr hThread;
-            public int dwProcessId;
-            public int dwThreadId;
-        }
-
-        private const int STARTF_USESHOWWINDOW = 0x00000001;
-        private const short SW_SHOWMINNOACTIVE = 7; // Показать свернутым, окно не становится активным
-        private const uint WTS_CURRENT_SERVER_HANDLE = 0;
-
-        #endregion
-
-        #region Win32 API Imports
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool CloseHandle(IntPtr hObject);
-
-        [DllImport("wtsapi32.dll", SetLastError = true)]
-        private static extern int WTSEnumerateSessions(IntPtr hServer, int Reserved, int Version, ref IntPtr ppSessionInfo, ref int pCount);
-
-        [DllImport("wtsapi32.dll")]
-        private static extern void WTSFreeMemory(IntPtr pMemory);
-
-        [DllImport("wtsapi32.dll", SetLastError = true)]
-        private static extern bool WTSQueryUserToken(uint sessionId, out IntPtr Token);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern bool CreateProcessAsUser(
-            IntPtr hToken,
-            string lpApplicationName,
-            string lpCommandLine,
-            IntPtr lpProcessAttributes,
-            IntPtr lpThreadAttributes,
-            bool bInheritHandles,
-            uint dwCreationFlags,
-            IntPtr lpEnvironment,
-            string lpCurrentDirectory,
-            ref STARTUPINFO lpStartupInfo,
-            out PROCESS_INFORMATION lpProcessInformation);
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct WTS_SESSION_INFO
-        {
-            public uint SessionId;
-            [MarshalAs(UnmanagedType.LPStr)]
-            public string pWinStationName;
-            public int State; // 0 = Active
-        }
-
-        #endregion
-
-        // Метод для поиска ID активного пользователя за компьютером
-        private static uint GetActiveSessionId()
-        {
-            IntPtr pSessionInfo = IntPtr.Zero;
-            int count = 0;
-            uint activeSessionId = uint.MaxValue;
-
-            if (WTSEnumerateSessions((IntPtr)WTS_CURRENT_SERVER_HANDLE, 0, 1, ref pSessionInfo, ref count) != 0)
-            {
-                int arrayElementSize = Marshal.SizeOf(typeof(WTS_SESSION_INFO));
-                IntPtr current = pSessionInfo;
-
-                for (int i = 0; i < count; i++)
-                {
-                    var si = (WTS_SESSION_INFO)Marshal.PtrToStructure(current, typeof(WTS_SESSION_INFO));
-                    if (si.State == 0) // WTSActive
-                    {
-                        activeSessionId = si.SessionId;
-                        break;
-                    }
-                    current += arrayElementSize;
-                }
-                WTSFreeMemory(pSessionInfo);
-            }
-            return activeSessionId;
-        }
-
-        // Основной метод запуска
-        public static bool StartConsoleMinimized(string appPath, string arguments = "")
-        {
-            uint sessionId = GetActiveSessionId();
-            if (sessionId == uint.MaxValue) return false; // Нет активных пользователей
-
-            if (!WTSQueryUserToken(sessionId, out IntPtr userToken)) return false;
-
-            STARTUPINFO si = new STARTUPINFO();
-            si.cb = Marshal.SizeOf(si);
-            si.lpDesktop = "winsta0\\default"; // Указывает на рабочий стол пользователя
-            si.dwFlags = STARTF_USESHOWWINDOW;
-            si.wShowWindow = SW_SHOWMINNOACTIVE; // Важный флаг: Свернуто и неактивно
-
-            PROCESS_INFORMATION pi = new PROCESS_INFORMATION();
-
-            // Формируем командную строку (первым аргументом должен идти сам путь)
-            string commandLine = $"\"{appPath}\" {arguments}";
-
-            bool result = CreateProcessAsUser(
-                userToken,
-                null,
-                commandLine,
-                IntPtr.Zero,
-                IntPtr.Zero,
-                false,
-                0,
-                IntPtr.Zero,
-                null,
-                ref si,
-                out pi
-            );
-
-            // Чистим хэндлы
-            if (result)
-            {
-                CloseHandle(pi.hProcess);
-                CloseHandle(pi.hThread);
-            }
-            CloseHandle(userToken);
-
-            return result;
         }
     }
 }

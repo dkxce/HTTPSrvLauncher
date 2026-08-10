@@ -1,7 +1,12 @@
 {	
     "8090": {
-        "ServerPath": "C:\\DISK4\\TorrServer\\TorrServer-windows-amd64.exe",
+        "ServerPath": "C:\\DISK4\\TorrServer\\TorrServer-windows-amd64.exe",		
+		"Arguments": "--path \"C:\\DISK4\\TorrServer\"",
 		"SendWebRedirect": true,
-		"Arguments": "--path \"C:\\DISK4\\TorrServer\""
+		"RedirectDelay": 10,
+		"WaitForExit": true,
+		"LoopOnAppExit": true,
+		"CheckPortBusy": true,
+		"AppLog": true
     }
 }
