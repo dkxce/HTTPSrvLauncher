@@ -1,5 +1,7 @@
 # HTTPSrvLauncher
 
+[RU](README.md) | [EN](README.en.md)
+
 `HTTPSrvLauncher`It is a lightweight automation tool (Windows service) that listens to specified network ports and automatically launches original server applications (e.g.`TorrServer`, `Ace Stream`or any other web servers) only at the time of the first incoming request.
 
 This allows you to save system resources (RAM and CPU), without keeping servers constantly running in the background.
