@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'README.md'
-      - 'DISASM/README.md'
   workflow_dispatch:
 
 permissions:
@@ -22,5 +21,4 @@ jobs:
         with:
           translate_paths: |
             README.md
-            DISASM/README.md
           convert_skip: '**'
